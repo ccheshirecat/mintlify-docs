@@ -1,0 +1,111 @@
+---
+title: 'Key Concepts'
+description: 'Understanding the core concepts of Hypr-Visor'
+---
+
+# Key Concepts
+
+This page explains the core concepts and terminology used in Hypr-Visor.
+
+## Firecracker MicroVMs
+
+Hypr-Visor is built on top of [Firecracker](https://firecracker-microvm.github.io/), a virtual machine monitor (VMM) developed by AWS that enables secure, multi-tenant, minimal-overhead execution of container and function workloads.
+
+<Note>
+  Firecracker MicroVMs are lightweight virtual machines that provide the security and isolation of traditional VMs with the speed and efficiency of containers.
+</Note>
+
+Key characteristics of Firecracker MicroVMs:
+
+- **Fast Boot Times**: MicroVMs can boot in as little as 125ms
+- **Low Memory Overhead**: Each MicroVM adds only about 5MB of overhead
+- **Strong Isolation**: Hardware-level isolation between workloads
+- **Minimal Attack Surface**: Firecracker has a minimal device model and a small codebase
+
+## Virtual Machines (VMs)
+
+In Hypr-Visor, a VM represents a Firecracker MicroVM instance. Each VM has:
+
+- **Resources**: vCPUs, RAM, and storage
+- **Network Interface**: Connected to a virtual network
+- **Operating System**: Based on a rootfs image
+- **Lifecycle**: Can be created, started, stopped, restarted, and terminated
+
+## Networking
+
+Hypr-Visor provides networking capabilities for VMs through:
+
+- **Bridge Network**: A virtual bridge that connects VMs to each other and optionally to the outside world
+- **DHCP**: Automatic IP address assignment to VMs
+- **Security Groups**: Firewall rules that control inbound and outbound traffic
+- **Network Isolation**: VMs can be isolated in their own network segments
+
+## Storage
+
+Hypr-Visor offers flexible storage options:
+
+- **Root Volumes**: The primary disk for each VM, based on a rootfs image
+- **Data Volumes**: Additional persistent storage that can be attached to VMs
+- **Snapshots**: Point-in-time copies of volumes for backup or cloning
+
+## Clustering
+
+Hypr-Visor can operate in a clustered mode, where multiple Hypr-Visor instances work together:
+
+- **Nodes**: Individual Hypr-Visor instances in the cluster
+- **Leader Election**: Automatic selection of a leader node
+- **Distributed State**: Shared state across all nodes
+- **Resource Allocation**: Intelligent placement of VMs across nodes
+
+## High Availability (HA)
+
+Hypr-Visor provides high availability features to ensure VM uptime:
+
+- **HA Policies**: Rules that define how VMs should be protected
+- **Auto Restart**: Automatic restart of failed VMs
+- **Failover**: Moving VMs to another node if the current node fails
+- **Health Monitoring**: Continuous monitoring of VM health
+
+## Live Migration
+
+Live migration allows moving a running VM from one host to another without downtime:
+
+- **State Transfer**: Copying the VM's memory and device state
+- **Minimal Downtime**: The VM continues running during most of the migration
+- **Bandwidth Control**: Limiting the network bandwidth used for migration
+- **Compression**: Reducing the amount of data transferred
+
+## Performance Optimization
+
+Hypr-Visor includes features to optimize VM performance:
+
+- **CPU Pinning**: Dedicating physical CPU cores to specific VMs
+- **Huge Pages**: Using larger memory pages for better performance
+- **I/O Priority**: Prioritizing disk I/O for critical VMs
+- **Network QoS**: Controlling network bandwidth and latency
+
+## Monitoring and Alerting
+
+Hypr-Visor provides comprehensive monitoring and alerting:
+
+- **Metrics**: Collection of performance metrics from hosts and VMs
+- **Thresholds**: Configurable thresholds for alerting
+- **Alerts**: Notifications when thresholds are exceeded
+- **Dashboards**: Visual representation of system status
+
+## API and CLI
+
+Hypr-Visor can be controlled through:
+
+- **REST API**: A comprehensive HTTP API for programmatic control
+- **CLI**: A command-line interface for easy management
+- **Dashboard**: A web-based UI for visual management
+
+## Next Steps
+
+Now that you understand the key concepts of Hypr-Visor, you can:
+
+- [Install Hypr-Visor](/installation)
+- [Create your first VM](/quickstart#creating-your-first-vm)
+- [Explore the API](/api-reference/authentication)
+- [Learn about VM management](/user-guide/vm-management)

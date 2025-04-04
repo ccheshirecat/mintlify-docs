@@ -1,0 +1,936 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Hypr-Visor API",
+    "description": "API for managing Hypr-Visor virtual machines and resources",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Hypr-Visor Support",
+      "url": "https://github.com/ccheshirecat/hypr-visor"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "token"
+      }
+    },
+    "schemas": {
+      "VM": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the VM"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the VM"
+          },
+          "ip": {
+            "type": "string",
+            "description": "IP address of the VM"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["creating", "running", "stopping", "stopped", "restarting", "terminating", "failed"],
+            "description": "Current status of the VM"
+          },
+          "vcpu": {
+            "type": "integer",
+            "description": "Number of virtual CPUs"
+          },
+          "ram_mb": {
+            "type": "integer",
+            "description": "RAM in megabytes"
+          },
+          "storage_mb": {
+            "type": "integer",
+            "description": "Storage in megabytes"
+          },
+          "os": {
+            "type": "string",
+            "description": "Operating system"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags associated with the VM"
+          },
+          "security_groups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Security groups associated with the VM"
+          },
+          "available_actions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["start", "stop", "restart", "terminate"]
+            },
+            "description": "Actions that can be performed on the VM in its current state"
+          },
+          "node_id": {
+            "type": "string",
+            "description": "ID of the node hosting the VM"
+          }
+        }
+      },
+      "CreateVMRequest": {
+        "type": "object",
+        "required": ["name", "vcpu", "ram_mb", "storage_mb", "os", "ssh_key"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the VM"
+          },
+          "vcpu": {
+            "type": "integer",
+            "description": "Number of virtual CPUs"
+          },
+          "ram_mb": {
+            "type": "integer",
+            "description": "RAM in megabytes"
+          },
+          "storage_mb": {
+            "type": "integer",
+            "description": "Storage in megabytes"
+          },
+          "os": {
+            "type": "string",
+            "description": "Operating system"
+          },
+          "ssh_key": {
+            "type": "string",
+            "description": "SSH public key for access"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags for the VM"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "User ID for multi-tenant setups"
+          }
+        }
+      },
+      "VMStatusResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "VM ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "New status of the VM"
+          }
+        }
+      },
+      "VMTagsRequest": {
+        "type": "object",
+        "required": ["tags"],
+        "properties": {
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags for the VM"
+          }
+        }
+      },
+      "VMTagsResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "VM ID"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Updated tags for the VM"
+          }
+        }
+      },
+      "VMMetadata": {
+        "type": "object",
+        "properties": {
+          "vm_id": {
+            "type": "string",
+            "description": "VM ID"
+          },
+          "hostname": {
+            "type": "string",
+            "description": "Hostname of the VM"
+          },
+          "ip": {
+            "type": "string",
+            "description": "IP address of the VM"
+          },
+          "mac_address": {
+            "type": "string",
+            "description": "MAC address of the VM"
+          },
+          "kernel_version": {
+            "type": "string",
+            "description": "Kernel version running on the VM"
+          },
+          "os_version": {
+            "type": "string",
+            "description": "OS version running on the VM"
+          },
+          "uptime_seconds": {
+            "type": "integer",
+            "description": "Uptime in seconds"
+          },
+          "boot_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Time when the VM was booted"
+          }
+        }
+      },
+      "VMConsoleLog": {
+        "type": "object",
+        "properties": {
+          "vm_id": {
+            "type": "string",
+            "description": "VM ID"
+          },
+          "log": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Console log lines"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "description": "HTTP status code"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error type"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/vms": {
+      "get": {
+        "summary": "List VMs",
+        "description": "Returns a list of virtual machines",
+        "operationId": "listVMs",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter VMs by status",
+            "schema": {
+              "type": "string",
+              "enum": ["creating", "running", "stopping", "stopped", "restarting", "terminating", "failed"]
+            }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "Filter VMs by tag",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of VMs to return",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of VMs to skip",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of VMs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VM"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create VM",
+        "description": "Creates a new virtual machine",
+        "operationId": "createVM",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVMRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "VM created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VM"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vms/{id}": {
+      "get": {
+        "summary": "Get VM",
+        "description": "Returns details of a specific VM",
+        "operationId": "getVM",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "VM ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VM details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VM"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VM not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Terminate VM",
+        "description": "Terminates a VM",
+        "operationId": "terminateVM",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "VM ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VM termination initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VMStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VM not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vms/{id}/start": {
+      "post": {
+        "summary": "Start VM",
+        "description": "Starts a stopped VM",
+        "operationId": "startVM",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "VM ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VM start initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VMStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VM not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vms/{id}/stop": {
+      "post": {
+        "summary": "Stop VM",
+        "description": "Stops a running VM",
+        "operationId": "stopVM",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "VM ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VM stop initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VMStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VM not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vms/{id}/restart": {
+      "post": {
+        "summary": "Restart VM",
+        "description": "Restarts a running VM",
+        "operationId": "restartVM",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "VM ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VM restart initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VMStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VM not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vms/{id}/tags": {
+      "patch": {
+        "summary": "Update VM Tags",
+        "description": "Updates the tags of a VM",
+        "operationId": "updateVMTags",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "VM ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VMTagsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "VM tags updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VMTagsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VM not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vms/{id}/metadata": {
+      "get": {
+        "summary": "Get VM Metadata",
+        "description": "Returns metadata for a VM",
+        "operationId": "getVMMetadata",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "VM ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VM metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VMMetadata"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VM not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vms/{id}/console-log": {
+      "get": {
+        "summary": "Get VM Console Log",
+        "description": "Returns the console log for a VM",
+        "operationId": "getVMConsoleLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "VM ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lines",
+            "in": "query",
+            "description": "Number of lines to return",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VM console log",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VMConsoleLog"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VM not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

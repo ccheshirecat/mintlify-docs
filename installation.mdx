@@ -1,0 +1,193 @@
+---
+title: 'Installation'
+description: 'Detailed installation instructions for Hypr-Visor'
+---
+
+# Installation
+
+This guide provides detailed instructions for installing Hypr-Visor in different environments.
+
+## System Requirements
+
+### Minimum Requirements
+
+- **CPU**: x86_64 with virtualization extensions (Intel VT-x or AMD-V)
+- **Memory**: 4GB RAM
+- **Storage**: 20GB free disk space
+- **Operating System**: Linux kernel 4.14 or later
+- **Software**: KVM enabled, Node.js 16 or later
+
+### Recommended Requirements
+
+- **CPU**: 4+ cores with virtualization extensions
+- **Memory**: 8GB+ RAM
+- **Storage**: 50GB+ SSD
+- **Network**: 1Gbps Ethernet
+- **Operating System**: Ubuntu 20.04 LTS or later
+
+## Installation Methods
+
+<Tabs>
+  <Tab title="From Source">
+    ### Installing from Source
+
+    #### 1. Clone the Repository
+
+    ```bash
+    git clone https://github.com/ccheshirecat/hypr-visor.git
+    cd hypr-visor
+    ```
+
+    #### 2. Install Dependencies
+
+    ```bash
+    npm install
+    ```
+
+    #### 3. Build the Application
+
+    ```bash
+    npm run build
+    ```
+
+    #### 4. Configure Environment
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Edit the `.env` file to match your environment.
+
+    #### 5. Start the Application
+
+    For development:
+    ```bash
+    npm run start:dev
+    ```
+
+    For production:
+    ```bash
+    npm run start:prod
+    ```
+  </Tab>
+  <Tab title="Using Docker">
+    ### Installing with Docker
+
+    #### 1. Pull the Docker Image
+
+    ```bash
+    docker pull ccheshirecat/hypr-visor:latest
+    ```
+
+    #### 2. Create a Configuration File
+
+    ```bash
+    mkdir -p /etc/hypr-visor
+    ```
+
+    Create a `.env` file in `/etc/hypr-visor` with your configuration.
+
+    #### 3. Run the Container
+
+    ```bash
+    docker run -d \
+      --name hypr-visor \
+      --restart always \
+      --privileged \
+      -v /var/lib/firecracker:/var/lib/firecracker \
+      -v /etc/hypr-visor/.env:/.env \
+      -p 3000:3000 \
+      ccheshirecat/hypr-visor:latest
+    ```
+  </Tab>
+  <Tab title="Using Script">
+    ### Installing with Script
+
+    We provide a deployment script that automates the installation process:
+
+    ```bash
+    curl -sSL https://raw.githubusercontent.com/ccheshirecat/hypr-visor/main/scripts/deploy-production.sh | sudo bash
+    ```
+
+    This script will:
+    - Check system requirements
+    - Install dependencies
+    - Download Firecracker
+    - Clone the repository
+    - Build the application
+    - Configure the environment
+    - Set up systemd services
+    - Configure networking
+    - Start the services
+
+    You can also download the script and customize it before running:
+
+    ```bash
+    wget https://raw.githubusercontent.com/ccheshirecat/hypr-visor/main/scripts/deploy-production.sh
+    chmod +x deploy-production.sh
+    ./deploy-production.sh
+    ```
+  </Tab>
+</Tabs>
+
+## Verifying Installation
+
+After installation, you can verify that Hypr-Visor is running correctly:
+
+```bash
+# Check if the API is responding
+curl http://localhost:3000
+
+# Check the logs
+journalctl -u hypr-visor -f
+```
+
+You should also be able to access the dashboard at `http://localhost:3000/dashboard`.
+
+## Firecracker Setup
+
+Hypr-Visor requires Firecracker to be installed on your system. If you used the deployment script, Firecracker is already installed. Otherwise, you can install it manually:
+
+```bash
+# Download Firecracker
+wget https://github.com/firecracker-microvm/firecracker/releases/download/v1.3.0/firecracker-v1.3.0-x86_64
+chmod +x firecracker-v1.3.0-x86_64
+sudo mv firecracker-v1.3.0-x86_64 /usr/bin/firecracker
+
+# Download kernel and rootfs
+mkdir -p /var/lib/firecracker/images
+wget -O /var/lib/firecracker/images/vmlinux https://s3.amazonaws.com/spec.ccfc.min/img/quickstart_guide/x86_64/kernels/vmlinux.bin
+wget -O /var/lib/firecracker/images/rootfs.ext4 https://s3.amazonaws.com/spec.ccfc.min/img/quickstart_guide/x86_64/rootfs/bionic.rootfs.ext4
+```
+
+## Network Configuration
+
+Hypr-Visor requires a network bridge for VM networking. If you used the deployment script, the bridge is already configured. Otherwise, you can configure it manually:
+
+```bash
+# Create a bridge
+sudo ip link add visor0 type bridge
+sudo ip addr add 192.168.100.1/24 dev visor0
+sudo ip link set visor0 up
+
+# Configure dnsmasq for DHCP
+sudo apt-get install -y dnsmasq
+sudo bash -c 'cat > /etc/dnsmasq.d/hypr-visor << EOF
+interface=visor0
+dhcp-range=192.168.100.2,192.168.100.254,255.255.255.0,12h
+dhcp-option=option:router,192.168.100.1
+dhcp-option=option:dns-server,8.8.8.8,8.8.4.4
+EOF'
+
+# Restart dnsmasq
+sudo systemctl restart dnsmasq
+```
+
+## Next Steps
+
+Now that you have Hypr-Visor installed, you can:
+
+- [Create your first VM](/quickstart#creating-your-first-vm)
+- [Configure the CLI](/cli-reference/installation)
+- [Explore the API](/api-reference/authentication)
+- [Learn about VM management](/user-guide/vm-management)

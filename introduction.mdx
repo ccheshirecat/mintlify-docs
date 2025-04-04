@@ -1,71 +1,69 @@
 ---
-title: Introduction
-description: "Welcome to the home of your new documentation"
+title: 'Introduction'
+description: 'Welcome to the Hypr-Visor documentation'
 ---
 
-<img
-  className="block dark:hidden"
-  src="/images/hero-light.png"
-  alt="Hero Light"
-/>
-<img
-  className="hidden dark:block"
-  src="/images/hero-dark.png"
-  alt="Hero Dark"
-/>
+# Hypr-Visor
 
-## Setting up
+A high-performance, production-ready hypervisor system built on top of Firecracker.
 
-The first step to world-class documentation is setting up your editing environments.
+## What is Hypr-Visor?
+
+Hypr-Visor is a next-generation virtualization platform that leverages Firecracker microVMs to provide lightning-fast, secure, and efficient virtual machines. It's designed for developers and infrastructure teams who need the performance and isolation of VMs with the speed and convenience of containers.
 
 <CardGroup cols={2}>
-  <Card
-    title="Edit Your Docs"
-    icon="pen-to-square"
-    href="https://mintlify.com/docs/quickstart"
-  >
-    Get your docs set up locally for easy development
+  <Card title="Quick Start" icon="bolt" href="/quickstart">
+    Get up and running with Hypr-Visor in minutes
   </Card>
-  <Card
-    title="Preview Changes"
-    icon="image"
-    href="https://mintlify.com/docs/development"
-  >
-    Preview your changes before you push to make sure they're perfect
+  <Card title="API Reference" icon="code" href="/api-reference/authentication">
+    Explore the Hypr-Visor API
+  </Card>
+  <Card title="CLI Reference" icon="terminal" href="/cli-reference/installation">
+    Learn how to use the Hypr-Visor CLI
+  </Card>
+  <Card title="Admin Guide" icon="gear" href="/admin-guide/deployment">
+    Deploy and manage Hypr-Visor in production
   </Card>
 </CardGroup>
 
-## Make it yours
+## Key Features
 
-Update your docs to your brand and add valuable content for the best user conversion.
+### VM Management
+Create, start, stop, restart, and terminate VMs with ease through a simple API or CLI.
 
-<CardGroup cols={2}>
-  <Card
-    title="Customize Style"
-    icon="palette"
-    href="https://mintlify.com/docs/settings/global"
-  >
-    Customize your docs to your company's colors and brands
-  </Card>
-  <Card
-    title="Reference APIs"
-    icon="code"
-    href="https://mintlify.com/docs/api-playground/openapi"
-  >
-    Automatically generate endpoints from an OpenAPI spec
-  </Card>
-  <Card
-    title="Add Components"
-    icon="screwdriver-wrench"
-    href="https://mintlify.com/docs/content/components/accordions"
-  >
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card
-    title="Get Inspiration"
-    icon="stars"
-    href="https://mintlify.com/customers"
-  >
-    Check out our showcase of our favorite documentation
-  </Card>
-</CardGroup>
+### Networking
+Advanced networking with security groups and network isolation to keep your VMs secure.
+
+### Storage
+Flexible storage management with volumes and snapshots for persistent data.
+
+### Monitoring
+Comprehensive monitoring and alerting system to keep track of your infrastructure.
+
+### Performance Optimization
+Automatic performance tuning for maximum efficiency, including CPU pinning, huge pages, and more.
+
+### Live Migration
+Move running VMs between hosts without downtime for maintenance or load balancing.
+
+### High Availability
+Ensure VM availability with automatic failover and recovery mechanisms.
+
+### Clustering
+Distribute workloads across multiple nodes for scalability and reliability.
+
+## Architecture
+
+Hypr-Visor is built on a modern, modular architecture that leverages the best open-source technologies:
+
+- **Firecracker**: The underlying virtualization technology that provides secure, fast microVMs
+- **NestJS**: A progressive Node.js framework for building efficient and scalable server-side applications
+- **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript
+- **Redis**: An in-memory data structure store used for caching and pub/sub messaging
+- **SQLite**: A self-contained, high-reliability, embedded SQL database engine
+
+<img src="/images/architecture.png" alt="Hypr-Visor Architecture" />
+
+## Getting Started
+
+Ready to dive in? Check out our [Quick Start Guide](/quickstart) to get up and running with Hypr-Visor in minutes.

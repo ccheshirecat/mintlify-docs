@@ -1,0 +1,115 @@
+---
+title: 'Authentication'
+description: 'How to authenticate with the Hypr-Visor API'
+---
+
+# Authentication
+
+All API requests to Hypr-Visor require authentication using a token-based approach.
+
+## API Tokens
+
+Hypr-Visor uses a simple token-based authentication system. Each request must include an `Authorization` header with a Bearer token.
+
+```
+Authorization: Bearer YOUR_API_TOKEN
+```
+
+The API token is generated during deployment and stored in the environment configuration. It can be found in the `/etc/default/hypr-visor` file on the server or by running:
+
+```bash
+grep API_TOKEN /etc/default/hypr-visor
+```
+
+<Warning>
+  For security reasons, only authorized systems should have access to this token. Do not share your API token publicly.
+</Warning>
+
+## Making Authenticated Requests
+
+Here's an example of making an authenticated request to the API:
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:3000/vms \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+```
+
+```javascript Node.js
+const axios = require('axios');
+
+const response = await axios.get('http://localhost:3000/vms', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_TOKEN'
+  }
+});
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'http://localhost:3000/vms',
+    headers={
+        'Authorization': 'Bearer YOUR_API_TOKEN'
+    }
+)
+```
+</CodeGroup>
+
+## Error Responses
+
+If authentication fails, the API will return a `401 Unauthorized` response:
+
+```json
+{
+  "statusCode": 401,
+  "message": "Unauthorized",
+  "error": "Unauthorized"
+}
+```
+
+Common authentication errors:
+
+| Status Code | Error | Description |
+| --- | --- | --- |
+| 401 | Missing Authorization header | The request does not include an Authorization header |
+| 401 | Invalid Authorization header format | The Authorization header is not in the format `Bearer TOKEN` |
+| 401 | Invalid API token | The provided token is not valid |
+
+## Security Best Practices
+
+To keep your Hypr-Visor deployment secure:
+
+1. **Rotate tokens regularly**: Generate a new API token periodically
+2. **Use HTTPS**: Always use HTTPS in production to encrypt API traffic
+3. **Limit access**: Only allow trusted systems to access the API
+4. **Monitor usage**: Keep track of API usage and watch for suspicious activity
+
+## Generating a New Token
+
+If you need to generate a new API token, you can update the `API_TOKEN` environment variable:
+
+```bash
+# Generate a new token
+NEW_TOKEN=$(openssl rand -hex 32)
+
+# Update the environment configuration
+sudo sed -i "s/API_TOKEN=.*/API_TOKEN=$NEW_TOKEN/" /etc/default/hypr-visor
+
+# Restart the service to apply the change
+sudo systemctl restart hypr-visor
+```
+
+<Note>
+  After changing the API token, you'll need to update all clients that use the API, including the CLI configuration.
+</Note>
+
+## Next Steps
+
+Now that you understand how to authenticate with the API, you can explore the available endpoints:
+
+- [VM Management](/api-reference/vm)
+- [Network Management](/api-reference/network)
+- [Storage Management](/api-reference/storage)
+- [Monitoring](/api-reference/monitoring)

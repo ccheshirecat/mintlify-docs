@@ -1,0 +1,253 @@
+---
+title: 'VM Management'
+description: 'Creating and managing virtual machines'
+---
+
+# VM Management
+
+This guide covers the basics of creating and managing virtual machines (VMs) with Hypr-Visor.
+
+## VM Lifecycle
+
+A VM in Hypr-Visor goes through several states during its lifecycle:
+
+1. **Creating**: The VM is being provisioned
+2. **Running**: The VM is running and available
+3. **Stopping**: The VM is in the process of shutting down
+4. **Stopped**: The VM is shut down but can be started again
+5. **Restarting**: The VM is restarting
+6. **Terminating**: The VM is being deleted
+7. **Failed**: The VM encountered an error
+
+<Frame>
+  <img src="/images/vm-lifecycle.png" alt="VM Lifecycle" />
+</Frame>
+
+## Creating a VM
+
+To create a VM, you need to specify its configuration, including resources, operating system, and SSH key.
+
+<CodeGroup>
+```bash API
+curl -X POST http://localhost:3000/vms \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-secret-token" \
+  -d '{
+    "name": "web-server",
+    "vcpu": 2,
+    "ram_mb": 1024,
+    "storage_mb": 10240,
+    "os": "ubuntu",
+    "ssh_key": "ssh-rsa AAAA..."
+  }'
+```
+
+```bash CLI
+hypr vm create \
+  --name web-server \
+  --vcpu 2 \
+  --ram 1024 \
+  --storage 10240 \
+  --os ubuntu \
+  --ssh-key "ssh-rsa AAAA..."
+```
+</CodeGroup>
+
+### VM Configuration Options
+
+| Parameter | Description | Default | Required |
+| --- | --- | --- | --- |
+| `name` | Name of the VM | - | Yes |
+| `vcpu` | Number of virtual CPUs | 1 | Yes |
+| `ram_mb` | RAM in megabytes | 512 | Yes |
+| `storage_mb` | Storage in megabytes | 5120 | Yes |
+| `os` | Operating system (alpine, ubuntu, debian, etc.) | alpine | Yes |
+| `ssh_key` | SSH public key for access | - | Yes |
+| `tags` | Array of tags for the VM | [] | No |
+| `user_id` | User ID for multi-tenant setups | - | No |
+
+## Listing VMs
+
+You can list all VMs to see their status and configuration.
+
+<CodeGroup>
+```bash API
+curl -X GET http://localhost:3000/vms \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+```bash CLI
+hypr vm list
+```
+</CodeGroup>
+
+Example response:
+
+```json
+[
+  {
+    "id": "vm-123",
+    "name": "web-server",
+    "ip": "192.168.100.2",
+    "status": "running",
+    "vcpu": 2,
+    "ram_mb": 1024,
+    "storage_mb": 10240,
+    "os": "ubuntu",
+    "created_at": "2023-06-15T10:30:00Z",
+    "tags": ["web", "production"],
+    "security_groups": ["default", "web"],
+    "available_actions": ["stop", "restart", "terminate"],
+    "node_id": "node-1"
+  }
+]
+```
+
+## Getting VM Details
+
+To get detailed information about a specific VM:
+
+<CodeGroup>
+```bash API
+curl -X GET http://localhost:3000/vms/vm-123 \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+```bash CLI
+hypr vm get vm-123
+```
+</CodeGroup>
+
+## Starting a VM
+
+To start a stopped VM:
+
+<CodeGroup>
+```bash API
+curl -X POST http://localhost:3000/vms/vm-123/start \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+```bash CLI
+hypr vm start vm-123
+```
+</CodeGroup>
+
+## Stopping a VM
+
+To stop a running VM:
+
+<CodeGroup>
+```bash API
+curl -X POST http://localhost:3000/vms/vm-123/stop \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+```bash CLI
+hypr vm stop vm-123
+```
+</CodeGroup>
+
+## Restarting a VM
+
+To restart a running VM:
+
+<CodeGroup>
+```bash API
+curl -X POST http://localhost:3000/vms/vm-123/restart \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+```bash CLI
+hypr vm restart vm-123
+```
+</CodeGroup>
+
+## Terminating a VM
+
+To permanently delete a VM:
+
+<Warning>
+  This action cannot be undone. All data on the VM will be lost.
+</Warning>
+
+<CodeGroup>
+```bash API
+curl -X DELETE http://localhost:3000/vms/vm-123 \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+```bash CLI
+hypr vm terminate vm-123
+```
+</CodeGroup>
+
+## Connecting to a VM
+
+Once a VM is running, you can connect to it using SSH:
+
+```bash
+ssh -i /path/to/private/key root@192.168.100.2
+```
+
+<Note>
+  The username depends on the OS image. For Alpine and Ubuntu, it's usually `root`. For other distributions, it might be different.
+</Note>
+
+## VM Tags
+
+Tags are key-value pairs that you can attach to a VM to organize and categorize them. You can add tags when creating a VM or update them later.
+
+<CodeGroup>
+```bash API
+curl -X PATCH http://localhost:3000/vms/vm-123/tags \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-secret-token" \
+  -d '{
+    "tags": ["web", "production", "customer-a"]
+  }'
+```
+
+```bash CLI
+hypr vm update-tags vm-123 --tags web,production,customer-a
+```
+</CodeGroup>
+
+## VM Metadata
+
+Each VM has metadata that provides additional information about the VM. You can access this metadata through the API:
+
+<CodeGroup>
+```bash API
+curl -X GET http://localhost:3000/vms/vm-123/metadata \
+  -H "Authorization: Bearer your-secret-token"
+```
+
+```bash CLI
+hypr vm metadata vm-123
+```
+</CodeGroup>
+
+Example response:
+
+```json
+{
+  "vm_id": "vm-123",
+  "hostname": "web-server",
+  "ip": "192.168.100.2",
+  "mac_address": "AA:BB:CC:DD:EE:FF",
+  "kernel_version": "5.4.0",
+  "os_version": "Ubuntu 20.04",
+  "uptime_seconds": 3600,
+  "boot_time": "2023-06-15T10:30:00Z"
+}
+```
+
+## Next Steps
+
+Now that you know how to manage VMs, you can:
+
+- [Learn about networking](/user-guide/networking)
+- [Set up storage volumes](/user-guide/storage)
+- [Configure monitoring and alerts](/user-guide/monitoring)
+- [Explore advanced features](/advanced/performance-optimization)

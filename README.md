@@ -1,32 +1,52 @@
-# Mintlify Starter Kit
+# Hypr-Visor Documentation
 
-Click on `Use this template` to copy the Mintlify starter kit. The starter kit contains examples including
+This directory contains the Mintlify documentation for the Hypr-Visor project.
 
-- Guide pages
-- Navigation
-- Customizations
-- API Reference pages
-- Use of popular components
+## Getting Started
 
-### Development
+To preview the documentation locally:
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the documentation changes locally. To install, use the following command
+1. Install the Mintlify CLI:
+   ```bash
+   npm i -g mintlify
+   ```
 
-```
-npm i -g mintlify
-```
+2. Navigate to the documentation directory:
+   ```bash
+   cd docs/mintlify
+   ```
 
-Run the following command at the root of your documentation (where docs.json is)
+3. Start the development server:
+   ```bash
+   mintlify dev
+   ```
 
-```
-mintlify dev
-```
+The documentation will be available at http://localhost:3000.
 
-### Publishing Changes
+## Structure
 
-Install our Github App to auto propagate changes from your repo to your deployment. Changes will be deployed to production automatically after pushing to the default branch. Find the link to install on your dashboard. 
+- `mint.json`: Configuration file for Mintlify
+- `openapi.json`: OpenAPI specification for the API
+- `*.mdx`: Documentation pages in MDX format
+- `logo/`: Logo files
+- `images/`: Images used in the documentation
 
-#### Troubleshooting
+## Deployment
 
-- Mintlify dev isn't running - Run `mintlify install` it'll re-install dependencies.
-- Page loads as a 404 - Make sure you are running in a folder with `docs.json`
+To deploy the documentation to Mintlify:
+
+1. Create a Mintlify account at https://mintlify.com/
+2. Connect your GitHub repository
+3. Configure the deployment settings
+
+For more information, see the [Mintlify documentation](https://mintlify.com/docs/quickstart).
+
+## Contributing
+
+To contribute to the documentation:
+
+1. Create a new branch
+2. Make your changes
+3. Submit a pull request
+
+Please follow the existing structure and style when adding new pages or sections.

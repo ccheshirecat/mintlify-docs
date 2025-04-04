@@ -1,0 +1,110 @@
+{
+  "name": "Hypr-Visor",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0069ED",
+    "light": "#4D9CFF",
+    "dark": "#0050B4"
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/ccheshirecat/hypr-visor"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Dashboard",
+    "url": "/dashboard"
+  },
+  "anchors": [
+    {
+      "name": "API Reference",
+      "icon": "rectangle-terminal",
+      "url": "api-reference"
+    },
+    {
+      "name": "CLI Reference",
+      "icon": "square-terminal",
+      "url": "cli-reference"
+    },
+    {
+      "name": "Admin Guide",
+      "icon": "gear",
+      "url": "admin-guide"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "installation",
+        "concepts"
+      ]
+    },
+    {
+      "group": "User Guide",
+      "pages": [
+        "user-guide/vm-management",
+        "user-guide/networking",
+        "user-guide/storage",
+        "user-guide/monitoring"
+      ]
+    },
+    {
+      "group": "Advanced Features",
+      "pages": [
+        "advanced/performance-optimization",
+        "advanced/live-migration",
+        "advanced/high-availability",
+        "advanced/clustering"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/authentication",
+        "api-reference/vm",
+        "api-reference/network",
+        "api-reference/storage",
+        "api-reference/monitoring",
+        "api-reference/performance",
+        "api-reference/migration",
+        "api-reference/ha",
+        "api-reference/cluster"
+      ]
+    },
+    {
+      "group": "CLI Reference",
+      "pages": [
+        "cli-reference/installation",
+        "cli-reference/configuration",
+        "cli-reference/vm",
+        "cli-reference/cluster",
+        "cli-reference/storage",
+        "cli-reference/monitoring",
+        "cli-reference/migration",
+        "cli-reference/ha"
+      ]
+    },
+    {
+      "group": "Administrator Guide",
+      "pages": [
+        "admin-guide/deployment",
+        "admin-guide/configuration",
+        "admin-guide/maintenance",
+        "admin-guide/backup-restore",
+        "admin-guide/troubleshooting"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/ccheshirecat/hypr-visor"
+  },
+  "openapi": "/openapi.json"
+}
