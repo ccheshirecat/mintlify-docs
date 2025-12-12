@@ -26,7 +26,9 @@
               "configuration",
               "architecture",
               "building-images",
-              "compose"
+              "compose",
+              "networking",
+              "volumes",
             ]
           },
           {
