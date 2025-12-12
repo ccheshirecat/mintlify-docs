@@ -15,10 +15,7 @@
         "groups": [
           {
             "group": "Introduction",
-            "pages": [
-              "index",
-              "getting-started"
-            ]
+            "pages": ["index", "getting-started"]
           },
           {
             "group": "Core Concepts",
@@ -28,16 +25,12 @@
               "building-images",
               "compose",
               "networking",
-              "volumes",
+              "volumes"
             ]
           },
           {
             "group": "References",
-            "pages": [
-              "CLI-reference",
-              "GPU",
-              "troubleshooting"
-            ]
+            "pages": ["CLI-reference", "GPU", "troubleshooting"]
           }
         ]
       }
